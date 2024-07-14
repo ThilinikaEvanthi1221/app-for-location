@@ -11,17 +11,17 @@ import { getAuth } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDnRZ8GtO1JSnl-8OduPhvJoa3IdodjRM4",
-  authDomain: "npkproject-6f6b2.firebaseapp.com",
-  projectId: "npkproject-6f6b2",
-  storageBucket: "npkproject-6f6b2.appspot.com",
-  messagingSenderId: "602726911790",
-  appId: "1:602726911790:web:0598d809bc26c3270e34bf"
+  apiKey: "AIzaSyCgyCXHMuQvI-ilCOVQIyjUuR464qNqE4s",
+  authDomain: "npk-data-tracker-655de.firebaseapp.com",
+  projectId: "npk-data-tracker-655de",
+  storageBucket: "npk-data-tracker-655de.appspot.com",
+  messagingSenderId: "838481789154",
+  appId: "1:838481789154:web:ca4022ef49730c28bb1ebb"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 export { auth, db };
