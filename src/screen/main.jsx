@@ -16,7 +16,7 @@ const Main = () => {
   const carouselData = [
     {
       id: "01",
-      image: require("../assets/nitro.jpg"),
+      image: require("../assets/bus1.jpg"),
       screen: 'Nitrogen',
     },
     {
@@ -78,7 +78,7 @@ const Main = () => {
     //   style={styles.backgroundImage}
     // >
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <Text style={styles.headerText}>NPK Data Tracker</Text>
+        <Text style={styles.headerText}>WakeMe</Text>
         <FlatList
           data={carouselData}
           keyExtractor={(item) => item.id}
@@ -99,21 +99,6 @@ const Main = () => {
           />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigation.navigate('NPKcharts')}>
-          <CardComponent
-            image={require("../assets/npk.jpeg")}
-            name="NPK Values"
-            categories="See your values"
-          />
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={handleData}>
-          <CardComponent
-            image={require("../assets/data.jpeg")}
-            name="Data"
-            categories="See your data"
-          />
-        </TouchableOpacity>
 
         {/* Logout button */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>

@@ -19,10 +19,11 @@ const Home = () => {
     <ScrollView>
     <View style={styles.container}>
       <Image source={require("../assets/background.jpg")} style={styles.main}/>
-      <Text style={styles.title}>Welcome to NPK Data tracker </Text>
-      <Text style={styles.head}>“Unlock Your Soil’s Potential {'\n'}
-        with Precise  </Text>
-      <Text style={styles.track}>NPK Tracking!" </Text>
+      <Text style={styles.title}>Welcome</Text>
+      <Text style={styles.head}>Your 
+        Travel Partner {'\n'}
+         </Text>
+      <Text style={styles.track}>"WakeME" </Text>
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.loginButton}
         onPress={handleLogin}>

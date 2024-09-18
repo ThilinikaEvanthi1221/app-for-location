@@ -8,17 +8,11 @@ import Home from './src/screen/home';
 import Login from './src/screen/login';
 import Sign from './src/screen/signup';
 import Main from './src/screen/main';
+import Location from './src/screen/location';
 import { StatusBar } from 'expo-status-bar';
 import { colors } from './src/utils/color';
-import Potassium from './src/screen/potassium';
-import Phosphorus from './src/screen/posporus';
-import Nitrogen from './src/screen/nitrogen';
-import data from './src/screen/data';
-import Location from './src/screen/location';
-import ManualUpdate from './src/screen/ManualUpdate';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import useAuth from './src/hooks/useAuth';
-import NPKCharts from './src/screen/NPKcharts';
 
 
 const home = 'Home';
@@ -36,16 +30,11 @@ function HomeStack() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name={home} component={Home} />
         <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Sign-Up" component={Sign}/>
+        <Stack.Screen name="Sign-Up" component={Sign}/> 
+        <Stack.Screen name="Location" component={Location}/> 
         <Stack.Screen name="Main" component={Main}/>
-        <Stack.Screen name="Potassium" component={Potassium}/>
-        <Stack.Screen name="Phosphorus" component={Phosphorus}/>
-        <Stack.Screen name="Nitrogen" component={Nitrogen}/>
-        <Stack.Screen name="data" component={data}/>
-        <Stack.Screen name="Location" component={Location}/>
-        <Stack.Screen name="ManualUpdate" component={ManualUpdate}/>
-        <Stack.Screen name="NPKcharts" component={NPKCharts}/>
         
+      
       
       </Stack.Navigator>
     );
@@ -57,10 +46,8 @@ function HomeStack() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Sign-Up" component={Sign}/>
         <Stack.Screen name="Main" component={Main}/>
-        <Stack.Screen name="Potassium" component={Potassium}/>
-        <Stack.Screen name="Phosphorus" component={Phosphorus}/>
-        <Stack.Screen name="Nitrogen" component={Nitrogen}/>
-        <Stack.Screen name="data" component={data}/>
+        <Stack.Screen name="Location" component={Location}/>
+        
       </Stack.Navigator>
     );
 
@@ -97,7 +84,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.greendark,
   },
   colorBar: {
-    height: 30,
+    height: 40,
     width: '100%',
   },
 });
