@@ -4,10 +4,10 @@
     "slug": "app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "C:/Users/Thilinika/Desktop/work/APP/assets/icon.png",
+    "icon": "C:/Users/Thilinika/Desktop/work/APP/assets/background.jpg",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/icon.png",
+      "image": "./assets/background.jpg",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },

@@ -21,12 +21,12 @@ const Main = () => {
     },
     {
       id: "02",
-      image: require("../assets/posporus.jpeg"),
+      image: require("../assets/bus2.jpg"),
       screen: 'Phosphorus',
     },
     {
       id: "03",
-      image: require("../assets/potassium.jpg"),
+      image: require("../assets/bus3.png"),
       screen: 'Potassium',
     },
   ];
