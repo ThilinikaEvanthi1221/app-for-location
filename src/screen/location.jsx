@@ -1,16 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
-import Ionicons from 'react-native-vector-icons/Ionicons';  // Importing Ionicons for the search icon
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const LocationComponent = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [destinationAddress, setDestinationAddress] = useState('');
   const [destinationLocation, setDestinationLocation] = useState(null);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
+  const [alternativeRoutes, setAlternativeRoutes] = useState([]); // To store alternative routes
   const [errorMsg, setErrorMsg] = useState(null);
   const [address, setAddress] = useState(null);
+  const [watchId, setWatchId] = useState(null);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0); // New state for current step
 
   useEffect(() => {
     (async () => {
@@ -23,11 +35,68 @@ const LocationComponent = () => {
       let location = await Location.getCurrentPositionAsync({});
       setUserLocation(location.coords);
       fetchAddressFromCoordinates(location.coords.latitude, location.coords.longitude);
+      
+      const id = await Location.watchPositionAsync(
+        { accuracy: Location.Accuracy.High, distanceInterval: 10 },
+        (newLocation) => {
+          setUserLocation(newLocation.coords);
+          checkProximity(newLocation.coords);
+        }
+      );
+
+      setWatchId(id);
     })();
+
+    return () => {
+      if (watchId) {
+        watchId.remove();
+      }
+    };
   }, []);
 
+  const checkProximity = (currentLocation) => {
+    if (destinationLocation && routeCoordinates.length > 0) {
+      const nextStep = routeCoordinates[currentStepIndex + 1];
+
+      if (nextStep) {
+        const distance = getDistance(
+          currentLocation.latitude,
+          currentLocation.longitude,
+          nextStep.latitude,
+          nextStep.longitude
+        );
+
+        if (distance <= 100) {
+          // Update to next step if close enough
+          if (currentStepIndex < routeCoordinates.length - 2) {
+            setCurrentStepIndex(currentStepIndex + 1);
+            Alert.alert("Next Step", `Proceed to the next step.`);
+          } else {
+            Alert.alert("You have reached your destination!", "You have completed your route.");
+          }
+        }
+      }
+    }
+  };
+
+  const getDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Radius of the Earth in km
+    const dLat = degreesToRadians(lat2 - lat1);
+    const dLon = degreesToRadians(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(degreesToRadians(lat1)) * Math.cos(degreesToRadians(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c * 1000; // Convert to meters
+  };
+
+  const degreesToRadians = (degrees) => {
+    return degrees * (Math.PI / 180);
+  };
+
   const fetchAddressFromCoordinates = async (latitude, longitude) => {
-    const apiKey = "AIzaSyBHCNET6A4CoxCkLMb-5gjyzJWSGAyD2VQ";
+    const apiKey = "AIzaSyBHCNET6A4CoxCkLMb-5gjyzJWSGAyD2VQ"; // Replace with your Geocoding API key
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
 
     try {
@@ -36,8 +105,6 @@ const LocationComponent = () => {
       if (data.results.length > 0) {
         const formattedAddress = data.results[0].formatted_address;
         setAddress(formattedAddress);
-      } else {
-        console.error("No address found for the coordinates");
       }
     } catch (error) {
       console.error("Error fetching address:", error);
@@ -45,7 +112,7 @@ const LocationComponent = () => {
   };
 
   const fetchCoordinatesFromAddress = async (address) => {
-    const apiKey = "AIzaSyBHCNET6A4CoxCkLMb-5gjyzJWSGAyD2VQ";
+    const apiKey = "AIzaSyBHCNET6A4CoxCkLMb-5gjyzJWSGAyD2VQ"; // Replace with your Geocoding API key
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
 
     try {
@@ -56,7 +123,7 @@ const LocationComponent = () => {
         setDestinationLocation(location);
         fetchRoute(location.lat, location.lng);
       } else {
-        console.error("No coordinates found for the address");
+        console.error("No coordinates found for the address", data);
         setDestinationLocation(null);
       }
     } catch (error) {
@@ -67,26 +134,30 @@ const LocationComponent = () => {
 
   const fetchRoute = async (destLat, destLng) => {
     if (userLocation) {
-      const apiKey = "AIzaSyBHCNET6A4CoxCkLMb-5gjyzJWSGAyD2VQ";
+      const apiKey = "AIzaSyBHCNET6A4CoxCkLMb-5gjyzJWSGAyD2VQ"; // Replace with your Directions API key
       const origin = `${userLocation.latitude},${userLocation.longitude}`;
       const destination = `${destLat},${destLng}`;
-      const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${apiKey}`;
+      const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&alternatives=true&key=${apiKey}`; // Add alternatives=true for multiple routes
 
       try {
         const response = await fetch(url);
         const data = await response.json();
-        if (data.routes.length > 0) {
-          console.log("Directions API response:", data);
-          const points = data.routes[0].overview_polyline.points;
-          const decodedPoints = decodePolyline(points);
+        if (data.routes && data.routes.length > 0) {
+          const mainRoutePoints = data.routes[0].overview_polyline.points;
+          const decodedPoints = decodePolyline(mainRoutePoints);
           setRouteCoordinates(decodedPoints);
+
+          const altRoutes = data.routes.slice(1).map(route => decodePolyline(route.overview_polyline.points));
+          setAlternativeRoutes(altRoutes); // Store alternative routes
         } else {
-          console.error("No route found");
+          console.error("No route found", data);
           setRouteCoordinates([]);
+          setAlternativeRoutes([]); // Clear alternative routes if no route found
         }
       } catch (error) {
         console.error("Error fetching route:", error);
         setRouteCoordinates([]);
+        setAlternativeRoutes([]); // Clear alternative routes on error
       }
     }
   };
@@ -175,13 +246,15 @@ const LocationComponent = () => {
         {routeCoordinates.length > 0 && (
           <Polyline
             coordinates={routeCoordinates}
-            strokeColor="blue"
-            strokeWidth={3}
+            strokeColor="#000" // Optional: Change the color of the route
+            strokeWidth={5} // Optional: Change the width of the route
           />
         )}
       </MapView>
-      {address && (
-        <Text style={styles.address}>{address}</Text>
+      {routeCoordinates.length > 0 && currentStepIndex < routeCoordinates.length && (
+        <Text style={styles.stepText}>
+          Current Step: {currentStepIndex + 1} / {routeCoordinates.length - 1}
+        </Text>
       )}
     </KeyboardAvoidingView>
   );
@@ -191,34 +264,26 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  map: {
+    flex: 1,
+  },
   searchContainer: {
     flexDirection: 'row',
     padding: 10,
     backgroundColor: 'white',
-    elevation: 3,
-    zIndex: 1, // Ensures it stays on top of the map
-    alignItems: 'center', // Aligns text input and icon
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
+    flex: 1,
     borderWidth: 1,
-    marginBottom: 10,
-    width: '85%',
-    paddingHorizontal: 10,
+    borderColor: 'gray',
+    borderRadius: 5,
+    padding: 10,
   },
-  map: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  address: {
-    position: 'absolute',
-    bottom: 16,
-    left: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    padding: 8,
-    borderRadius: 8,
-    fontSize: 16,
+  stepText: {
+    margin: 10,
+    fontSize: 18,
     fontWeight: 'bold',
+    color: '#000',
   },
 });
 
