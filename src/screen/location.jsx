@@ -96,7 +96,7 @@ const LocationComponent = () => {
   };
 
   const fetchAddressFromCoordinates = async (latitude, longitude) => {
-    const apiKey = "AIzaSyBHCNET6A4CoxCkLMb-5gjyzJWSGAyD2VQ"; // Replace with your Geocoding API key
+    const apiKey = "API KEY"; // Replace with your Geocoding API key
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
 
     try {
@@ -112,7 +112,7 @@ const LocationComponent = () => {
   };
 
   const fetchCoordinatesFromAddress = async (address) => {
-    const apiKey = "AIzaSyBHCNET6A4CoxCkLMb-5gjyzJWSGAyD2VQ"; // Replace with your Geocoding API key
+    const apiKey = "API KEY"; // Replace with your Geocoding API key
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
 
     try {
@@ -134,7 +134,7 @@ const LocationComponent = () => {
 
   const fetchRoute = async (destLat, destLng) => {
     if (userLocation) {
-      const apiKey = "AIzaSyBHCNET6A4CoxCkLMb-5gjyzJWSGAyD2VQ"; // Replace with your Directions API key
+      const apiKey = "API KEY"; // Replace with your Directions API key
       const origin = `${userLocation.latitude},${userLocation.longitude}`;
       const destination = `${destLat},${destLng}`;
       const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&alternatives=true&key=${apiKey}`; // Add alternatives=true for multiple routes
